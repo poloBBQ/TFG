@@ -41,6 +41,7 @@ public class Decision extends Composite {
   private Label _decisionTitle;
   private Label _voteCount;
   private Rectangle _rectangle;
+  private RadioButton _rb;
   
   private DecisionManager _decisionManager;
   
@@ -52,20 +53,21 @@ public class Decision extends Composite {
     this.messages = gadgetMessages;
     
     HorizontalPanel decisionPanel = new HorizontalPanel();
+    decisionPanel.setSpacing(10);
     decisionPanel.setVerticalAlignment(HasVerticalAlignment.ALIGN_MIDDLE);
-    RadioButton rb = new RadioButton("Decision");
-    rb.addClickHandler(new DecisionClickHandler());
+    _rb = new RadioButton("Decision");
+    DecisionClickHandler clickHandler = new DecisionClickHandler();
+    _rb.addClickHandler(clickHandler);
     _decisionTitle = new Label();
-    _decisionTitle.setStyleName("Label-unselected");
+    _decisionTitle.addClickHandler(clickHandler);
     //barPanel.getElement().getStyle().setBackgroundColor("Blue");
     DrawingArea canvas = new DrawingArea(BAR_MAX_WIDTH, BAR_HEIGHT);
     _rectangle = new Rectangle(0, 0, 60, BAR_HEIGHT);
     _rectangle.setFillColor(getColor());
-    _rectangle.setStrokeWidth(0);
     canvas.add(_rectangle);
-    _voteCount = new Label(Integer.toString(_votes));
-    _voteCount.setStyleName("Label-unselected");
-    decisionPanel.add(rb);
+    _voteCount = new Label();
+    
+    decisionPanel.add(_rb);
     decisionPanel.add(_decisionTitle);
     decisionPanel.setCellWidth(_decisionTitle, Integer.toString(LABEL_WIDTH));
     decisionPanel.add(canvas);
@@ -73,6 +75,8 @@ public class Decision extends Composite {
     decisionPanel.add(_voteCount);
     
     initWidget(decisionPanel);
+    
+    updateAspect();
     
     Scheduler.get().scheduleDeferred(new ScheduledCommand() {
       // We run this deferred, at the end of the gadget load
@@ -83,6 +87,10 @@ public class Decision extends Composite {
     });
   }
   
+  public String getDecisionText(){
+    return _decisionTitle.getText();
+  }
+  
   public void init(String name, DecisionManager decisionManager){
     _decisionTitle.setText(name);
     _decisionManager = decisionManager;
@@ -91,27 +99,66 @@ public class Decision extends Composite {
   private class DecisionClickHandler implements ClickHandler{
     @Override
     public void onClick(ClickEvent event) {
-      //_decisionTitle.removeStyleName("Label-unselected");
-      _decisionTitle.setStyleName("Label-selected");
-      _voteCount.setStyleName("Label-selected");
       _selected = true;
       _decisionManager.itemWasSelected(_decisionTitle.getText());
-      _rectangle.setStrokeWidth(2);
+      _votes++;
+      updateAspect();
     }
   }
   
-  public void itemIsNotSelected(){
+  private void updateAspect(){
     if(_selected){
-      _selected = false;
+      _decisionTitle.setStyleName("Label-selected");
+      _rectangle.setStrokeWidth(2);
+      _voteCount.setStyleName("Label-selected");
+      _rb.setValue(true);
+    }
+    else{
       _decisionTitle.setStyleName("Label-unselected");
       _rectangle.setStrokeWidth(0);
       _voteCount.setStyleName("Label-unselected");
+      _rb.setValue(false);
     }
-    // else do nothing
+    _voteCount.setText(Integer.toString(_votes));
+    
+    if(_rectangle != null){
+      int size;
+      try{
+        size = (int) (((float)_votes / (float)_decisionManager.getTotalVotes())
+          * BAR_MAX_WIDTH);
+      }
+      catch(Exception e){
+        size = 0;
+      }
+      
+      _rectangle.setWidth(size);
+    }
+  }
+  
+  public int getVotes(){
+    return _votes;
+  }
+  
+  public void setVoteCount(int count){
+    _votes = count;
+    updateAspect();
+  }
+  
+  /*
+   * Return true if it was previously selected
+   * */
+  public boolean itemIsNotSelected(){
+    if(_selected){
+      _selected = false;
+      _votes--;
+      updateAspect();
+      return true;
+    }
+    
+    return false;
   }
   
   private String getColor(){
-    String text = _decisionTitle.getText();
     int value = Random.nextInt(8);
     switch (value){
     case 0:

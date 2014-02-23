@@ -14,4 +14,9 @@ public interface DecisionManager {
    * name already exists). 
    * */
   public boolean addNewDecision(String itemName);
+  
+  /*
+   * The summation of the votes from all decisions
+   * */
+  public long getTotalVotes();
 }

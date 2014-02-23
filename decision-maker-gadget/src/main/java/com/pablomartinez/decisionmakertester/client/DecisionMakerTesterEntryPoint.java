@@ -13,7 +13,7 @@ import com.thezukunft.wave.connector.StateUpdateEvent;
 import com.thezukunft.wave.connectormock.WaveMock;
 
 public class DecisionMakerTesterEntryPoint implements EntryPoint {
-
+  
   /*
    * (non-Javadoc)
    * 
@@ -27,7 +27,7 @@ public class DecisionMakerTesterEntryPoint implements EntryPoint {
 
     // We initialize some participants
     waveMock.initRandomParticipants();
-
+    
     // We have to create the gadget using gin so it can use injection of its
     // dependencies (evenBus, etc)
 

@@ -35,6 +35,8 @@ public class DecisionMakerMainPanel extends Composite
   
   private final VerticalPanel _mainPanel;
   
+  private StateManager _stateManager;
+  
   @Inject
   public DecisionMakerMainPanel(final EventBus eventBus, final Wave wave,
       final DecisionMakerMessages gadgetMessages) {
@@ -46,35 +48,52 @@ public class DecisionMakerMainPanel extends Composite
     _wave = wave;    
     
     _mainPanel = new VerticalPanel();
-    _mainPanel.setSpacing(10);
+    
+    _stateManager = new StateManager(_wave, this);
+    
     addNewDecision("Irse de camping");
     addNewDecision("Discoteca");
     addNewDecision("Salir a pasear al parque");
     
+    ////////////////////////////////////////////////////////////////////////////
+    String labeltext = _wave.getState().get("testkey");
+    Label testLabel = new Label(); 
+    if(labeltext != null && !labeltext.equals("")){
+      testLabel.setText(labeltext);
+    }
+    else{
+      _wave.getState().submitValue("testkey", "testvalue");
+    }
+    _mainPanel.add(testLabel);
+    ////////////////////////////////////////////////////////////////////////////
+
     initWidget(_mainPanel);
     
     Scheduler.get().scheduleDeferred(new ScheduledCommand() {
       // We run this deferred, at the end of the gadget load
       @Override
       public void execute() {
-        
+        _stateManager.updateDecisions(_decisions);
       }
     });
   }
 
   @Override
   public void itemWasSelected(String itemName) {
-    String itemNameLower = itemName.toLowerCase();
+    String itemNameLower = itemName.toLowerCase().trim();
     for (Entry<String, Decision> decision : _decisions.entrySet()){
       if(!itemNameLower.equals(decision.getKey())){
-        decision.getValue().itemIsNotSelected();
+        if (decision.getValue().itemIsNotSelected()){
+          _stateManager.removeVoteFromDecision(decision.getValue());
+        }
       }
     }
+    _stateManager.addVoteToDecision(_decisions.get(itemNameLower));
   }
 
   @Override
   public boolean addNewDecision(String itemName) {
-    String itemNameLower = itemName.toLowerCase();
+    String itemNameLower = itemName.toLowerCase().trim();
     synchronized (_decisions) {
       if (_decisions.containsKey(itemNameLower)) {
         return false;
@@ -84,10 +103,20 @@ public class DecisionMakerMainPanel extends Composite
         decision.init(itemName, this);
         _decisions.put(itemNameLower, decision);
         _mainPanel.add(decision);
+        _stateManager.addDecision(decision);
         return true;
       } catch (Exception e) {
         return false;
       }
     }
+  }
+
+  @Override
+  public long getTotalVotes() {
+    long votes = 0;
+    for (Entry<String, Decision> decision : _decisions.entrySet()){
+      votes += decision.getValue().getVotes();
+    }
+    return votes;
   }
 }
