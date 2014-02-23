@@ -2,7 +2,10 @@
 package com.pablomartinez.decisionmaker.client;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.core.client.Scheduler.ScheduledCommand;
@@ -21,24 +24,34 @@ import com.thezukunft.wave.connector.StateUpdateEventHandler;
 import com.thezukunft.wave.connector.Wave;
 
 
-public class DecisionMakerMainPanel extends Composite {
+public class DecisionMakerMainPanel extends Composite
+    implements DecisionManager {
   
-  /** The messages. */
-  private final DecisionMakerMessages messages;
+  private final Map<String, Decision> _decisions;
+  
+  private final DecisionMakerMessages _messages;
+  private final EventBus _eventBus;
+  private final Wave _wave;
+  
+  private final VerticalPanel _mainPanel;
   
   @Inject
   public DecisionMakerMainPanel(final EventBus eventBus, final Wave wave,
       final DecisionMakerMessages gadgetMessages) {
-    this.messages = gadgetMessages;
     
-    VerticalPanel mainPanel = new VerticalPanel();
-    Decision decision1 = new Decision(eventBus, wave, gadgetMessages);
-    Decision decision2 = new Decision(eventBus, wave, gadgetMessages);
-    Decision decision3 = new Decision(eventBus, wave, gadgetMessages);
-    mainPanel.add(decision1);
-    mainPanel.add(decision2);
-    mainPanel.add(decision3);
-    initWidget(mainPanel);
+    _decisions = new HashMap<String, Decision>();
+      
+    _eventBus = eventBus;
+    _messages = gadgetMessages;
+    _wave = wave;    
+    
+    _mainPanel = new VerticalPanel();
+    _mainPanel.setSpacing(10);
+    addNewDecision("Irse de camping");
+    addNewDecision("Discoteca");
+    addNewDecision("Salir a pasear al parque");
+    
+    initWidget(_mainPanel);
     
     Scheduler.get().scheduleDeferred(new ScheduledCommand() {
       // We run this deferred, at the end of the gadget load
@@ -47,5 +60,34 @@ public class DecisionMakerMainPanel extends Composite {
         
       }
     });
+  }
+
+  @Override
+  public void itemWasSelected(String itemName) {
+    String itemNameLower = itemName.toLowerCase();
+    for (Entry<String, Decision> decision : _decisions.entrySet()){
+      if(!itemNameLower.equals(decision.getKey())){
+        decision.getValue().itemIsNotSelected();
+      }
+    }
+  }
+
+  @Override
+  public boolean addNewDecision(String itemName) {
+    String itemNameLower = itemName.toLowerCase();
+    synchronized (_decisions) {
+      if (_decisions.containsKey(itemNameLower)) {
+        return false;
+      }
+      try {
+        Decision decision = new Decision(_eventBus, _wave, _messages);
+        decision.init(itemName, this);
+        _decisions.put(itemNameLower, decision);
+        _mainPanel.add(decision);
+        return true;
+      } catch (Exception e) {
+        return false;
+      }
+    }
   }
 }

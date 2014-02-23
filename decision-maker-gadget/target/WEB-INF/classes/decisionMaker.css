@@ -1,0 +1,11 @@
+.Label-unselected{ 
+   font-size: 100%; 
+   weight: normal;
+   background-color: blue;
+}
+
+.Label-selected{ 
+   font-size: 120%; 
+   weight: bold;
+   background-color: red;
+}
