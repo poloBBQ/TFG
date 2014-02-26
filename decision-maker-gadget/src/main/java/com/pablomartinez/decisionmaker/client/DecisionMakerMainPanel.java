@@ -54,9 +54,9 @@ public class DecisionMakerMainPanel extends Composite
     addNewDecision("Irse de camping");
     addNewDecision("Discoteca");
     addNewDecision("Salir a pasear al parque");
+    itemWasSelected(null);
     
-    ////////////////////////////////////////////////////////////////////////////
-    String labeltext = _wave.getState().get("testkey");
+    /*String labeltext = _wave.getState().get("testkey");
     Label testLabel = new Label(); 
     if(labeltext != null && !labeltext.equals("")){
       testLabel.setText(labeltext);
@@ -64,8 +64,7 @@ public class DecisionMakerMainPanel extends Composite
     else{
       _wave.getState().submitValue("testkey", "testvalue");
     }
-    _mainPanel.add(testLabel);
-    ////////////////////////////////////////////////////////////////////////////
+    _mainPanel.add(testLabel);*/
 
     initWidget(_mainPanel);
     
@@ -77,18 +76,35 @@ public class DecisionMakerMainPanel extends Composite
       }
     });
   }
+  
+  @Override
+  public void onLoad() {
+    Scheduler.get().scheduleDeferred(new ScheduledCommand() {
+      @Override
+      public void execute() {
+        setConsistentHeight();
+      }
+    });
+  }
 
   @Override
   public void itemWasSelected(String itemName) {
-    String itemNameLower = itemName.toLowerCase().trim();
-    for (Entry<String, Decision> decision : _decisions.entrySet()){
-      if(!itemNameLower.equals(decision.getKey())){
-        if (decision.getValue().itemIsNotSelected()){
-          _stateManager.removeVoteFromDecision(decision.getValue());
-        }
+    if(itemName == null){
+      for (Entry<String, Decision> decision : _decisions.entrySet()){
+        decision.getValue().updateAspect();
       }
     }
-    _stateManager.addVoteToDecision(_decisions.get(itemNameLower));
+    else{
+      String itemNameLower = itemName.toLowerCase().trim();
+      for (Entry<String, Decision> decision : _decisions.entrySet()){
+        if(!itemNameLower.equals(decision.getKey())){
+          if (decision.getValue().itemIsNotSelected()){
+            _stateManager.removeVoteFromDecision(decision.getValue());
+          }
+        }
+      }
+      _stateManager.addVoteToDecision(_decisions.get(itemNameLower));
+    }
   }
 
   @Override
@@ -104,6 +120,7 @@ public class DecisionMakerMainPanel extends Composite
         _decisions.put(itemNameLower, decision);
         _mainPanel.add(decision);
         _stateManager.addDecision(decision);
+        setConsistentHeight();
         return true;
       } catch (Exception e) {
         return false;
@@ -118,5 +135,23 @@ public class DecisionMakerMainPanel extends Composite
       votes += decision.getValue().getVotes();
     }
     return votes;
+  }
+  
+  public void setConsistentHeight(){
+    int height = getMaxHeight();
+    if(height == 0)
+      return;
+    for (Entry<String, Decision> decision : _decisions.entrySet()){
+      decision.getValue().setHeight(height);
+    }
+  }
+  
+  public int getMaxHeight(){
+    int height = 0;
+    for (Entry<String, Decision> decision : _decisions.entrySet()){
+      int decisionHeight = decision.getValue().getHeight(); 
+      height = decisionHeight > height ? decisionHeight : height;
+    }
+    return height;
   }
 }

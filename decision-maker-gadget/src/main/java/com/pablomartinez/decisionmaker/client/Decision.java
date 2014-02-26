@@ -11,6 +11,10 @@ import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.core.client.Scheduler.ScheduledCommand;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.MouseOutEvent;
+import com.google.gwt.event.dom.client.MouseOutHandler;
+import com.google.gwt.event.dom.client.MouseOverEvent;
+import com.google.gwt.event.dom.client.MouseOverHandler;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.Random;
 import com.google.gwt.user.client.ui.Button;
@@ -33,15 +37,17 @@ public class Decision extends Composite {
   public static final int BAR_MAX_WIDTH = 150;
   public static final int LABEL_WIDTH = 80;
   
-  private int _votes = 0;
+  private int _votes = 3;
   
   /** The messages. */
   private final DecisionMakerMessages messages;
   
+  private HorizontalPanel _decisionPanel;
   private Label _decisionTitle;
   private Label _voteCount;
   private Rectangle _rectangle;
   private RadioButton _rb;
+  private VotesPopup _popup;
   
   private DecisionManager _decisionManager;
   
@@ -52,29 +58,32 @@ public class Decision extends Composite {
       final DecisionMakerMessages gadgetMessages) {
     this.messages = gadgetMessages;
     
-    HorizontalPanel decisionPanel = new HorizontalPanel();
-    decisionPanel.setSpacing(10);
-    decisionPanel.setVerticalAlignment(HasVerticalAlignment.ALIGN_MIDDLE);
+    _decisionPanel = new HorizontalPanel();
+    //_decisionPanel.setSpacing(10);
+    _decisionPanel.setVerticalAlignment(HasVerticalAlignment.ALIGN_MIDDLE);
     _rb = new RadioButton("Decision");
     DecisionClickHandler clickHandler = new DecisionClickHandler();
     _rb.addClickHandler(clickHandler);
     _decisionTitle = new Label();
     _decisionTitle.addClickHandler(clickHandler);
-    //barPanel.getElement().getStyle().setBackgroundColor("Blue");
     DrawingArea canvas = new DrawingArea(BAR_MAX_WIDTH, BAR_HEIGHT);
     _rectangle = new Rectangle(0, 0, 60, BAR_HEIGHT);
     _rectangle.setFillColor(getColor());
+    _rectangle.addClickHandler(clickHandler);
     canvas.add(_rectangle);
     _voteCount = new Label();
+    _voteCount.addClickHandler(clickHandler);
+    _voteCount.addMouseOverHandler(new MouseOverVotesHandler());
+    _voteCount.addMouseOutHandler(new MousOutaVotesHandler());
     
-    decisionPanel.add(_rb);
-    decisionPanel.add(_decisionTitle);
-    decisionPanel.setCellWidth(_decisionTitle, Integer.toString(LABEL_WIDTH));
-    decisionPanel.add(canvas);
-    decisionPanel.setCellWidth(canvas, Integer.toString(BAR_MAX_WIDTH));
-    decisionPanel.add(_voteCount);
+    _decisionPanel.add(_rb);
+    _decisionPanel.add(_decisionTitle);
+    _decisionPanel.setCellWidth(_decisionTitle, Integer.toString(LABEL_WIDTH));
+    _decisionPanel.add(canvas);
+    _decisionPanel.setCellWidth(canvas, Integer.toString(BAR_MAX_WIDTH));
+    _decisionPanel.add(_voteCount);
     
-    initWidget(decisionPanel);
+    initWidget(_decisionPanel);
     
     updateAspect();
     
@@ -94,19 +103,36 @@ public class Decision extends Composite {
   public void init(String name, DecisionManager decisionManager){
     _decisionTitle.setText(name);
     _decisionManager = decisionManager;
+    _popup = new VotesPopup(name, _rectangle.getFillColor());
   }
   
   private class DecisionClickHandler implements ClickHandler{
     @Override
     public void onClick(ClickEvent event) {
-      _selected = true;
-      _decisionManager.itemWasSelected(_decisionTitle.getText());
-      _votes++;
-      updateAspect();
+      if (!_selected) {
+        _selected = true;
+        _decisionManager.itemWasSelected(_decisionTitle.getText());
+        _votes++;
+        updateAspect();
+      }
     }
   }
   
-  private void updateAspect(){
+  private class MouseOverVotesHandler implements MouseOverHandler{
+    @Override
+    public void onMouseOver(MouseOverEvent event) {
+      _popup.showRelativeTo(_voteCount);
+    }
+  }
+  
+  private class MousOutaVotesHandler implements MouseOutHandler{
+    @Override
+    public void onMouseOut(MouseOutEvent event) {
+      _popup.hide();
+    }
+  }
+  
+  public void updateAspect(){
     if(_selected){
       _decisionTitle.setStyleName("Label-selected");
       _rectangle.setStrokeWidth(2);
@@ -158,8 +184,18 @@ public class Decision extends Composite {
     return false;
   }
   
+  public int getHeight(){
+    return _decisionTitle.getOffsetHeight();    
+  }
+  
+  public void setHeight(int height){
+    String sHeight = Integer.toString(height);
+    _decisionPanel.setHeight(sHeight);
+    _decisionPanel.setCellHeight(_decisionTitle, sHeight);
+  }
+  
   private String getColor(){
-    int value = Random.nextInt(8);
+    int value = Random.nextInt(14);
     switch (value){
     case 0:
       return "red";
@@ -177,6 +213,18 @@ public class Decision extends Composite {
       return "purple";
     case 7:
       return "silver";
+    case 8:
+      return "gray";
+    case 9:
+      return "brown";
+    case 10:
+      return "lightgreen";
+    case 11:
+      return "orangered";
+    case 12:
+      return "magenta";
+    case 13:
+      return "magenta";
     default:
       return "black";
     }

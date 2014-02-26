@@ -47,12 +47,15 @@ public class StateManager {
   public void updateDecisions(Map<String, Decision> decisions){
     JsArrayString keys = _wave.getState().getKeys();
     String format = "votecount-";
-    for(int i = 0; i < keys.length(); i++){
+    for (int i = 0; i < keys.length(); i++) {
       String key = keys.get(i);
-      String decisionName = key.substring(format.length()).toLowerCase().trim();
-      if(key.startsWith(format)){
-        decisions.get(decisionName).setVoteCount(
-            Integer.parseInt(_wave.getState().get(key)));
+      if (key.length() > format.length()) {
+        String decisionName =
+            key.substring(format.length()).toLowerCase().trim();
+        if (key.startsWith(format)) {
+          decisions.get(decisionName).setVoteCount(
+              Integer.parseInt(_wave.getState().get(key)));
+        }
       }
     }
   }
@@ -71,7 +74,7 @@ public class StateManager {
       i++;
     }
     if(!found){
-      _wave.getState().submitValue(format, "0");
+      _wave.getState().submitValue(format, "3");
     }
   }
 }

@@ -275,11 +275,11 @@ function decisionMakerTester(){
   $stats && $stats({moduleName:'decisionMakerTester', sessionId:$sessionId_0, subSystem:'startup', evtGroup:'bootstrap', millis:(new Date).getTime(), type:'selectingPermutation'});
   if (!isHostedMode()) {
     try {
-      unflattenKeylistIntoAnswers(['default'], 'B6079E3FBF39308B1186917ECE74598E');
-      unflattenKeylistIntoAnswers(['en'], 'B6079E3FBF39308B1186917ECE74598E');
-      unflattenKeylistIntoAnswers(['default'], 'B6079E3FBF39308B1186917ECE74598E' + ':1');
-      unflattenKeylistIntoAnswers(['en'], 'B6079E3FBF39308B1186917ECE74598E' + ':1');
-      unflattenKeylistIntoAnswers(['es'], 'E091B624B13C5BCD67CDA50094BC54DE');
+      unflattenKeylistIntoAnswers(['default'], '4D558EFD464F1C8E26A18BE17B11D039');
+      unflattenKeylistIntoAnswers(['en'], '4D558EFD464F1C8E26A18BE17B11D039');
+      unflattenKeylistIntoAnswers(['default'], '4D558EFD464F1C8E26A18BE17B11D039' + ':1');
+      unflattenKeylistIntoAnswers(['en'], '4D558EFD464F1C8E26A18BE17B11D039' + ':1');
+      unflattenKeylistIntoAnswers(['es'], '6A4B4A82BB720A6A32245BED61CAE91D');
       strongName = answers[computePropValue('locale')];
       var idx = strongName.indexOf(':');
       if (idx != -1) {
