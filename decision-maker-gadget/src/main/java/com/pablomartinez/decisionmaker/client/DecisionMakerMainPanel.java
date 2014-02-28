@@ -37,6 +37,8 @@ public class DecisionMakerMainPanel extends Composite
   
   private StateManager _stateManager;
   
+  private String _checkboxGroup;
+  
   @Inject
   public DecisionMakerMainPanel(final EventBus eventBus, final Wave wave,
       final DecisionMakerMessages gadgetMessages) {
@@ -68,11 +70,20 @@ public class DecisionMakerMainPanel extends Composite
 
     initWidget(_mainPanel);
     
+    
+    
     Scheduler.get().scheduleDeferred(new ScheduledCommand() {
       // We run this deferred, at the end of the gadget load
       @Override
       public void execute() {
         _stateManager.updateDecisions(_decisions);
+        
+        eventBus.addHandler(StateUpdateEvent.TYPE, new StateUpdateEventHandler() {
+          @Override
+          public void onUpdate(StateUpdateEvent event) {
+            _stateManager.updateDecisions(_decisions);
+          }
+        });
       }
     });
   }
@@ -89,12 +100,7 @@ public class DecisionMakerMainPanel extends Composite
 
   @Override
   public void itemWasSelected(String itemName) {
-    if(itemName == null){
-      for (Entry<String, Decision> decision : _decisions.entrySet()){
-        decision.getValue().updateAspect();
-      }
-    }
-    else{
+    if (itemName != null){
       String itemNameLower = itemName.toLowerCase().trim();
       for (Entry<String, Decision> decision : _decisions.entrySet()){
         if(!itemNameLower.equals(decision.getKey())){
@@ -104,6 +110,9 @@ public class DecisionMakerMainPanel extends Composite
         }
       }
       _stateManager.addVoteToDecision(_decisions.get(itemNameLower));
+    }
+    for (Entry<String, Decision> decision : _decisions.entrySet()){
+      decision.getValue().updateAspect();
     }
   }
 

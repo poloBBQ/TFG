@@ -32,11 +32,19 @@ public class DecisionMakerTesterEntryPoint implements EntryPoint {
     // dependencies (evenBus, etc)
 
     final DecisionMakerMainPanel gadget = gin.getMainPanel();
+    final DecisionMakerMainPanel gadget2 = gin.getMainPanel();
+    final DecisionMakerMainPanel gadget3 = gin.getMainPanel();
 
     Scheduler.get().scheduleDeferred(new ScheduledCommand() {
       @Override
       public void execute() {
+        RootPanel.get().add(new Label("Gadget 1"));
         RootPanel.get().add(gadget);
+        RootPanel.get().add(new Label("Gadget 2"));
+        RootPanel.get().add(gadget2);
+        RootPanel.get().add(new Label("Gadget 3"));
+        RootPanel.get().add(gadget3);
+        
         gin.getEventBus().fireEvent(new StateUpdateEvent(waveMock));
       }
     });

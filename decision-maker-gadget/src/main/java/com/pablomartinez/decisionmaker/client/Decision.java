@@ -37,7 +37,7 @@ public class Decision extends Composite {
   public static final int BAR_MAX_WIDTH = 150;
   public static final int LABEL_WIDTH = 80;
   
-  private int _votes = 3;
+  private int _votes = 0;
   
   /** The messages. */
   private final DecisionMakerMessages messages;
@@ -61,7 +61,7 @@ public class Decision extends Composite {
     _decisionPanel = new HorizontalPanel();
     //_decisionPanel.setSpacing(10);
     _decisionPanel.setVerticalAlignment(HasVerticalAlignment.ALIGN_MIDDLE);
-    _rb = new RadioButton("Decision");
+    _rb = new RadioButton(Integer.toString(Random.nextInt()));
     DecisionClickHandler clickHandler = new DecisionClickHandler();
     _rb.addClickHandler(clickHandler);
     _decisionTitle = new Label();
@@ -111,8 +111,9 @@ public class Decision extends Composite {
     public void onClick(ClickEvent event) {
       if (!_selected) {
         _selected = true;
-        _decisionManager.itemWasSelected(_decisionTitle.getText());
+        _rb.setValue(true);
         _votes++;
+        _decisionManager.itemWasSelected(_decisionTitle.getText());
         updateAspect();
       }
     }
@@ -176,8 +177,8 @@ public class Decision extends Composite {
   public boolean itemIsNotSelected(){
     if(_selected){
       _selected = false;
+      _rb.setValue(false);
       _votes--;
-      updateAspect();
       return true;
     }
     
@@ -224,7 +225,7 @@ public class Decision extends Composite {
     case 12:
       return "magenta";
     case 13:
-      return "magenta";
+      return "cyan";
     default:
       return "black";
     }

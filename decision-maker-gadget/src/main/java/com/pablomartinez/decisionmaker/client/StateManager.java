@@ -1,6 +1,7 @@
 package com.pablomartinez.decisionmaker.client;
 
 import java.util.Map;
+import java.util.Map.Entry;
 
 import com.google.gwt.core.client.JsArrayString;
 import com.thezukunft.wave.connector.Wave;
@@ -58,6 +59,9 @@ public class StateManager {
         }
       }
     }
+    for (Entry<String, Decision> decision : decisions.entrySet()){
+      decision.getValue().updateAspect();
+    }
   }
   
   public void addDecision(Decision decision){
@@ -73,8 +77,9 @@ public class StateManager {
       
       i++;
     }
+    
     if(!found){
-      _wave.getState().submitValue(format, "3");
+      _wave.getState().submitValue(format, "0");
     }
   }
 }
