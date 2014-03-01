@@ -24,8 +24,10 @@ import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.RadioButton;
+import com.google.gwt.user.client.ui.UIObject;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.inject.Inject;
+import com.thezukunft.wave.connector.Participant;
 import com.thezukunft.wave.connector.StateUpdateEvent;
 import com.thezukunft.wave.connector.StateUpdateEventHandler;
 import com.thezukunft.wave.connector.Wave;
@@ -75,12 +77,15 @@ public class Decision extends Composite {
     _voteCount.addClickHandler(clickHandler);
     _voteCount.addMouseOverHandler(new MouseOverVotesHandler());
     _voteCount.addMouseOutHandler(new MousOutaVotesHandler());
+    HorizontalPanel separator = new HorizontalPanel();
+    separator.setSpacing(5);
     
     _decisionPanel.add(_rb);
     _decisionPanel.add(_decisionTitle);
     _decisionPanel.setCellWidth(_decisionTitle, Integer.toString(LABEL_WIDTH));
     _decisionPanel.add(canvas);
     _decisionPanel.setCellWidth(canvas, Integer.toString(BAR_MAX_WIDTH));
+    _decisionPanel.add(separator);
     _decisionPanel.add(_voteCount);
     
     initWidget(_decisionPanel);
@@ -100,10 +105,11 @@ public class Decision extends Composite {
     return _decisionTitle.getText();
   }
   
-  public void init(String name, DecisionManager decisionManager){
+  public void init(String name, DecisionManager decisionManager,
+      StateManager stateManager){
     _decisionTitle.setText(name);
     _decisionManager = decisionManager;
-    _popup = new VotesPopup(name, _rectangle.getFillColor());
+    _popup = new VotesPopup(name, _rectangle.getFillColor(), stateManager);
   }
   
   private class DecisionClickHandler implements ClickHandler{
@@ -122,7 +128,7 @@ public class Decision extends Composite {
   private class MouseOverVotesHandler implements MouseOverHandler{
     @Override
     public void onMouseOver(MouseOverEvent event) {
-      _popup.showRelativeTo(_voteCount);
+      _popup.show(_voteCount);
     }
   }
   

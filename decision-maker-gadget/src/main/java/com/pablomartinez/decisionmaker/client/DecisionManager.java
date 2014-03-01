@@ -13,7 +13,7 @@ public interface DecisionManager {
    * Returns true if it was successful in adding it (i.e. an item with the same
    * name already exists). 
    * */
-  public boolean addNewDecision(String itemName);
+  public boolean addNewDecision(String itemName, boolean notifyStateChanged);
   
   /*
    * The summation of the votes from all decisions

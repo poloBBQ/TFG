@@ -1,0 +1,18 @@
+How is the state stored?
+------------------------
+
+There is some redundancy for making the data easier to access.
+
+1) Count of votes.
+One entry for each Decision.
+Key: The word 'votecount' followed by the separator, followed by the complete
+title of the Decision in low case and trimmed.
+Value: Integer. Number of total votes that decision has, among all users.
+
+2) Voters.
+One entry for each Decision.
+Key: The word 'voters' followed by the separator, followed by the complete title
+of the Decision in low case and trimmed.
+Value: String. List of users that have voted for that decision, separated by the
+separator. Beginning and ending by the separator.
+(Example: "|user1@kune.cc|user2@kune.cc|user3@kune.cc|")
