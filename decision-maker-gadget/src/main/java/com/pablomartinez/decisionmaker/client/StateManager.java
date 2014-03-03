@@ -11,7 +11,8 @@ import com.thezukunft.wave.connector.Wave;
 
 public class StateManager {
   public static final String FORMAT_VOTERS = "voters";
-  public static final String FORMAT_VOTE_COUNTS = "votecount"; 
+  public static final String FORMAT_VOTE_COUNTS = "votecount";
+  public static final String FORMAT_TITLE = "title"; 
   public static final char SEPARATOR = '-';
   
   private Wave _wave;
@@ -151,5 +152,13 @@ public class StateManager {
       _wave.getState().submitValue(formatCount, "0");
       _wave.getState().submitValue(formatVoters, Character.toString(SEPARATOR));
     }
+  }
+  
+  public String getTitle(){
+    return _wave.getState().get(FORMAT_TITLE);
+  }
+  
+  public void setTitle(String title){
+    _wave.getState().submitValue(FORMAT_TITLE, title);
   }
 }

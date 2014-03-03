@@ -16,3 +16,8 @@ of the Decision in low case and trimmed.
 Value: String. List of users that have voted for that decision, separated by the
 separator. Beginning and ending by the separator.
 (Example: "|user1@kune.cc|user2@kune.cc|user3@kune.cc|")
+
+3) Title.
+One single entry.
+Key: 'title'.
+Value: The title of the desired decision

@@ -11,6 +11,7 @@ import java.util.Set;
 
 import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.core.client.Scheduler.ScheduledCommand;
+import com.google.gwt.dom.client.Style.TextDecoration;
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -52,10 +53,13 @@ public class DecisionMakerMainPanel extends Composite
   
   private final VerticalPanel _mainPanel;
   private final VerticalPanel _verticalPanel;
+  private final HorizontalPanel _titlePanel;
   
   private final Button _addButton;
   private final TextBox _addBox;
   private final HorizontalPanel _addPanel;
+  
+  private Label _titleLabel = null;
   
   private StateManager _stateManager;
   
@@ -74,9 +78,22 @@ public class DecisionMakerMainPanel extends Composite
     _eventBus = eventBus;
     messages = gadgetMessages;
     _wave = wave;    
+    _stateManager = new StateManager(_wave, this);
     
     _mainPanel = new VerticalPanel();
     _mainPanel.setStyleName("Panel-styled");
+    
+    _titlePanel = new HorizontalPanel();
+    _titlePanel.setStyleName("Panel-margin");
+    String title = _stateManager.getTitle();
+    if(title != null){
+      addPermanentTitle(title);
+    }
+    else{
+      addEditableTitle();
+    }
+    
+    _mainPanel.add(_titlePanel);
     
     _verticalPanel = new VerticalPanel();
     _verticalPanel.setStyleName("Panel-margin");
@@ -84,15 +101,14 @@ public class DecisionMakerMainPanel extends Composite
     
     _mainPanel.add(_verticalPanel);
     
-    _stateManager = new StateManager(_wave, this);
-    
-    addNewDecision("Irse de camping", true);
+    /*addNewDecision("Irse de camping", true);
     addNewDecision("Discoteca", true);
-    addNewDecision("Salir a pasear al parque", true);
+    addNewDecision("Salir a pasear al parque", true);*/
     itemWasSelected(null);
     
     _addButton = new Button(messages.add_button());
     
+    _addButton.setEnabled(false);
     _addButton.addClickHandler(new ClickHandler() {
       @Override
       public void onClick(ClickEvent event) {
@@ -131,10 +147,71 @@ public class DecisionMakerMainPanel extends Composite
           @Override
           public void onUpdate(StateUpdateEvent event) {
             _stateManager.updateDecisions(_decisions);
+            String title = _stateManager.getTitle();
+            if(title != null && !title.equals("")){
+              addPermanentTitle(_stateManager.getTitle());
+            }
+            updateSizes();
           }
         });
       }
     });
+  }
+  
+  private void addPermanentTitle(String title){
+    _titlePanel.clear();
+    _titleLabel = new Label(title);
+    _titleLabel.setStyleName("Label-selected");
+    _titlePanel.add(_titleLabel);
+    _addButton.setEnabled(true);
+  }
+  
+  private void addEditableTitle(){
+    final TextBox title = new TextBox();
+    title.setText(messages.enter_title());
+    _titlePanel.add(title);
+    final Button doneButton = new Button(messages.done());
+    title.addKeyPressHandler(new KeyPressHandler() {
+      @Override
+      public void onKeyPress(KeyPressEvent event) {
+        if(event.getNativeEvent().getKeyCode() == KeyCodes.KEY_ENTER){
+          doneButton.click();
+        }
+      }
+    });
+    doneButton.addClickHandler(new ClickHandler() {
+      @Override
+      public void onClick(ClickEvent event) {
+        final String text = title.getText();
+        _titlePanel.remove(title);
+        _titlePanel.remove(doneButton);
+        _stateManager.setTitle(text);
+        addPermanentTitle(text);
+        updateSizes();
+      }
+    });
+    _titlePanel.add(doneButton);
+    title.addClickHandler(new ClickHandler() {
+      @Override
+      public void onClick(ClickEvent event) {
+        if(title.getText().equals(messages.enter_title())){
+          title.setText("");
+        }
+      }
+    });
+  }
+  
+  private void updateSizes(){
+    setConsistentHeight();
+    _addPanel.setWidth(
+        Integer.toString(_verticalPanel.getOffsetWidth()) + "px");
+    _addBox.setWidth(Integer.toString(
+        _addPanel.getOffsetWidth() - _addButton.getOffsetWidth() - 15) +
+        "px");
+    
+    if(_titleLabel != null){
+      _titleLabel.setWidth(_addPanel.getOffsetWidth() + "px");
+    }
   }
   
   @Override
@@ -142,12 +219,7 @@ public class DecisionMakerMainPanel extends Composite
     Scheduler.get().scheduleDeferred(new ScheduledCommand() {
       @Override
       public void execute() {
-        setConsistentHeight();
-        _addPanel.setWidth(
-            Integer.toString(_verticalPanel.getOffsetWidth()) + "px");
-        _addBox.setWidth(Integer.toString(
-            _addPanel.getOffsetWidth() - _addButton.getOffsetWidth() - 15) +
-            "px");
+        updateSizes();
       }
     });
   }
@@ -228,10 +300,17 @@ public class DecisionMakerMainPanel extends Composite
   }
   
   private void requestToAddDecision(){
-    String trimmed = _addBox.getText().trim();
-    String toLower = trimmed.toLowerCase();
+    boolean valid = true;
     
-    boolean valid = _stateManager.isValidFormat(trimmed);
+    if(!_addButton.isEnabled())
+      valid = false;
+      
+    String toLower = null;
+    String trimmed = null;
+    if(valid){
+      trimmed = _addBox.getText().trim();
+      toLower = trimmed.toLowerCase();
+    }
     
     if(valid){
       for (Entry<String, Decision> decision : _decisions.entrySet()){
