@@ -1,11 +1,20 @@
-.Label-unselected{ 
-   font-size: 100%; 
-   weight: normal;
-   background-color: blue;
+.Label-unselected{
+	font-weight: normal;
 }
 
-.Label-selected{ 
-   font-size: 120%; 
-   weight: bold;
-   background-color: red;
+.Label-selected{
+	font-weight: bold;
+}
+
+.Panel-styled{
+    border: 3px solid gray;
+    border-radius: 10px;
+    background: white;
+}
+
+.Panel-margin{
+	margin-top: 10px;
+	margin-left: 11px;
+	margin-right: 15px;
+	margin-bottom: 14px;
 }

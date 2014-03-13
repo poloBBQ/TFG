@@ -55,6 +55,10 @@ public class Decision extends Composite {
   
   private boolean _selected = false;
   
+  public Decision(){
+    messages = null;
+  }
+  
   @Inject
   public Decision(final EventBus eventBus, final Wave wave,
       final DecisionMakerMessages gadgetMessages) {

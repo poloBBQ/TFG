@@ -2,8 +2,6 @@
 package com.pablomartinez.decisionmakertester.client;
 
 
-import cc.kune.gadget.client.KuneGadgetGinInjector;
-
 import com.google.inject.Singleton;
 import com.pablomartinez.decisionmaker.client.DecisionMakerGinModule;
 import com.pablomartinez.decisionmaker.client.DecisionMakerMainPanel;

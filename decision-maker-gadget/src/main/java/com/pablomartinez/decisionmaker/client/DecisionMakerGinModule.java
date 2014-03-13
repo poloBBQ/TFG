@@ -1,12 +1,15 @@
 
 package com.pablomartinez.decisionmaker.client;
 
-import cc.kune.gadget.client.AbstractKuneGadgetGinModule;
-
+import com.google.gwt.inject.client.AbstractGinModule;
 import com.google.inject.Singleton;
 
-public class DecisionMakerGinModule extends AbstractKuneGadgetGinModule {
+public class DecisionMakerGinModule extends AbstractGinModule  {
 
+  public DecisionMakerGinModule(){
+    super();
+  }
+  
   /*
    * (non-Javadoc)
    * 
@@ -16,5 +19,5 @@ public class DecisionMakerGinModule extends AbstractKuneGadgetGinModule {
   protected void configure() {
     bind(DecisionMakerMainPanel.class).in(Singleton.class);
     bind(DecisionMakerMessages.class).in(Singleton.class);
-  };
+  }
 }

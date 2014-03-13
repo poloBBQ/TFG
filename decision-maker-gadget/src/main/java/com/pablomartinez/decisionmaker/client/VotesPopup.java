@@ -23,6 +23,8 @@ public class VotesPopup extends PopupPanel{
   private VerticalPanel _participantsPanel;
   private String _decisionTitle;
   
+  public VotesPopup(){}
+  
   public VotesPopup(String decisionTitle, String color,
       StateManager stateManager){
     

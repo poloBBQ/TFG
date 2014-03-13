@@ -18,6 +18,10 @@ public class StateManager {
   private Wave _wave;
   private final DecisionManager _decisionManager;
   
+  public StateManager(){
+    _decisionManager = null;
+  }
+  
   public StateManager(Wave wave, DecisionManager decisionManager) {
     _wave = wave;
     _decisionManager = decisionManager;

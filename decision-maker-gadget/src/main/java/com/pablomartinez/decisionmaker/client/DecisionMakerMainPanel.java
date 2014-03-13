@@ -69,9 +69,23 @@ public class DecisionMakerMainPanel extends Composite
     }
   };
   
+  public DecisionMakerMainPanel(){
+    _eventBus = null;
+    _addBox = null;
+    _decisions = null;
+    _addPanel = null;
+    _mainPanel = null;
+    _titlePanel = null;
+    _wave = null;
+    _verticalPanel = null;
+    _addButton = null;
+  }
+  
   @Inject
   public DecisionMakerMainPanel(final EventBus eventBus, final Wave wave,
       final DecisionMakerMessages gadgetMessages) {
+    
+    wave.log("Creating MainPanel");
     
     _decisions = new HashMap<String, Decision>();
       
